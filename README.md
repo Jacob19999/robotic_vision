@@ -1,5 +1,7 @@
 # Robotic Vision
 
+This repository is being developed for **CIS 630: Advanced Artificial Intelligence Systems**.
+
 ## Overview
 
 This repository defines a hardware-aware roadmap for a robotic vision project focused on **household object detection in realistic indoor scenes**. The intended workflow is:
@@ -170,6 +172,24 @@ Hardware-aware guidance:
 - use mixed precision
 - prefer frozen-backbone or parameter-efficient tuning first
 - keep batch size small and scale with gradient accumulation
+
+### Phase 1 current results
+
+The current repository state includes a validated Phase 1 scaffold and dry run for the
+real-data baseline workflow.
+
+- benchmark preparation completed successfully and produced `artifacts/manifests/phase1-benchmark.json`
+- the current sample benchmark uses `manifest_id: phase1-local`, one source (`coco2017`),
+  two accepted assets, and two active classes (`mug`, `book`)
+- both baseline commands run successfully at the CLI level and emit valid structured reports
+- the current Grounding DINO and Florence-2 runs are intentionally `blocked` until explicit
+  model wiring is added
+- fixture-backed completed reports were still used to validate the Phase 1 summary path, and
+  that comparison recommended `florence2` over `grounding_dino` (`mAP 0.62` vs `0.45`)
+- local validation passed with `7/7` pytest checks green
+
+This means Phase 1 is implemented as a reproducible benchmark-and-reporting pipeline, even
+though full live model execution is still gated on wiring the actual predictors.
 
 ### Phase 2: Lightweight synthetic data generation
 
@@ -352,3 +372,34 @@ tests reproducible without forcing heavyweight model downloads during repository
 
 The installed CLI entry point is `phase1`, with equivalent module access through
 `python -m src.cli.main`.
+
+## Phase 1 File Guide
+
+The main Phase 1 artifacts live under `specs/001-phase1-baseline/` and are organized so the
+project can be understood from requirements through implementation.
+
+- `specs/001-phase1-baseline/spec.md`
+  defines the Phase 1 feature scope, user stories, and success criteria
+- `specs/001-phase1-baseline/plan.md`
+  captures the implementation plan, technical context, hardware constraints, and structure
+- `specs/001-phase1-baseline/research.md`
+  records the key decisions behind model choice, dataset order, and local-environment strategy
+- `specs/001-phase1-baseline/data-model.md`
+  describes the core entities such as benchmark manifests, assets, runs, metrics, and failures
+- `specs/001-phase1-baseline/contracts/`
+  contains the CLI contract and the JSON schemas for benchmark manifests and run reports
+- `specs/001-phase1-baseline/tasks.md`
+  is the executable checklist used to implement and verify the Phase 1 work
+- `config/phase1.yaml`
+  is the sample local configuration for ontology and source selection
+- `src/cli/prepare_benchmark.py`
+  builds the normalized benchmark manifest from approved real-image inputs
+- `src/cli/run_baseline.py`
+  executes a baseline path and writes the structured run report
+- `src/cli/summarize_phase1.py`
+  compares completed runs and generates the Phase 1 summary artifact
+- `artifacts/reports/phase1-dry-run.md`
+  records the implementation dry run, what succeeded, and what is still intentionally blocked
+
+Together, these files provide the complete Phase 1 trail: what the project is supposed to do,
+how it is designed, how it was implemented, and what the current results look like.

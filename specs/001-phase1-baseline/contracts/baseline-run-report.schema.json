@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phase1-baseline-run-report.schema.json",
+  "title": "Phase 1 Baseline Run Report",
+  "type": "object",
+  "required": [
+    "run_id",
+    "model_family",
+    "run_mode",
+    "manifest_id",
+    "status",
+    "hardware_profile",
+    "metrics",
+    "created_at"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_mode": {
+      "type": "string",
+      "enum": [
+        "zero_shot",
+        "trainable",
+        "optional_stretch"
+      ]
+    },
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "blocked",
+        "failed"
+      ]
+    },
+    "hardware_profile": {
+      "type": "object",
+      "required": [
+        "gpu_name",
+        "gpu_vram_mb",
+        "system_ram_mb"
+      ],
+      "properties": {
+        "gpu_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gpu_vram_mb": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "system_ram_mb": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "metrics": {
+      "type": "object",
+      "required": [
+        "latency_ms_per_image",
+        "peak_vram_mb"
+      ],
+      "properties": {
+        "latency_ms_per_image": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peak_vram_mb": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mAP": {
+          "type": "number",
+          "minimum": 0
+        },
+        "precision": {
+          "type": "number",
+          "minimum": 0
+        },
+        "recall": {
+          "type": "number",
+          "minimum": 0
+        },
+        "per_class_ap": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "failure_examples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "failure_type",
+          "asset_id"
+        ],
+        "properties": {
+          "failure_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_path": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

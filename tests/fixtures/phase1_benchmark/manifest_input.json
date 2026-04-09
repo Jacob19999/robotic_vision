@@ -1,0 +1,41 @@
+{
+  "images": [
+    {
+      "id": 1,
+      "file_name": "images/mug-1.jpg",
+      "width": 640,
+      "height": 480
+    },
+    {
+      "id": 2,
+      "file_name": "images/book-1.jpg",
+      "width": 640,
+      "height": 480
+    }
+  ],
+  "annotations": [
+    {
+      "id": 101,
+      "image_id": 1,
+      "category_id": 1,
+      "bbox": [10, 12, 80, 100]
+    },
+    {
+      "id": 102,
+      "image_id": 2,
+      "category_id": 2,
+      "bbox": [30, 40, 120, 120]
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "cup"
+    },
+    {
+      "id": 2,
+      "name": "book"
+    }
+  ]
+}
+

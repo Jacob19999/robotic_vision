@@ -85,6 +85,121 @@
     "created_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "class_id",
+          "canonical_name",
+          "status"
+        ],
+        "properties": {
+          "class_id": {
+            "type": "string"
+          },
+          "canonical_name": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "source_id",
+          "original_identifier",
+          "relative_path",
+          "width",
+          "height",
+          "split_name",
+          "content_hash",
+          "review_status",
+          "annotations"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "original_identifier": {
+            "type": "string"
+          },
+          "relative_path": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "split_name": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "review_status": {
+            "type": "string"
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "annotation_id",
+                "class_id",
+                "source_label",
+                "bbox_xyxy",
+                "is_ignored"
+              ],
+              "properties": {
+                "annotation_id": {
+                  "type": "string"
+                },
+                "class_id": {
+                  "type": "string"
+                },
+                "source_label": {
+                  "type": "string"
+                },
+                "bbox_xyxy": {
+                  "type": "array",
+                  "minItems": 4,
+                  "maxItems": 4,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "is_ignored": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false

@@ -1,0 +1,22 @@
+manifest_id: phase1-local
+ontology_version: v1
+ontology:
+  - class_id: mug
+    canonical_name: mug
+    aliases:
+      - cup
+  - class_id: book
+    canonical_name: book
+    aliases: []
+sources:
+  - source_id: coco2017
+    name: COCO 2017 sample
+    source_type: public_curated
+    format: coco
+    path: ../tests/fixtures/phase1_benchmark/manifest_input.json
+splits:
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  seed: 42
+fail_on_unmapped: true

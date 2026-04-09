@@ -4,7 +4,7 @@
 
 Define the expected user-facing CLI commands for the Phase 1 benchmark pipeline.
 
-## Command 1: `prepare_benchmark`
+## Command 1: `prepare-benchmark`
 
 ### Responsibility
 
@@ -30,7 +30,7 @@ Define the expected user-facing CLI commands for the Phase 1 benchmark pipeline.
 - benchmark manifest file matching `benchmark-manifest.schema.json`
 - non-zero exit code when split integrity or ontology validation fails
 
-## Command 2: `run_baseline`
+## Command 2: `run-baseline`
 
 ### Responsibility
 
@@ -55,7 +55,7 @@ Define the expected user-facing CLI commands for the Phase 1 benchmark pipeline.
 - baseline report file matching `baseline-run-report.schema.json`
 - failure-example artifact directory or documented empty result
 
-## Command 3: `summarize_phase1`
+## Command 3: `summarize-phase1`
 
 ### Responsibility
 

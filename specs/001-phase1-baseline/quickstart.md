@@ -7,7 +7,7 @@ This quickstart describes the intended Phase 1 workflow after implementation.
 ```powershell
 uv venv --python 3.11
 .venv\Scripts\Activate.ps1
-uv pip install -r requirements.txt
+uv pip install -e ".[dev]"
 ```
 
 Expected result:
@@ -23,6 +23,7 @@ Prepare a configuration file that defines:
 - source priority order
 - source-label to canonical-label mappings
 - split policy for `train`, `val`, and `test_real_heldout`
+- source file paths relative to the config file location unless absolute paths are used
 
 Expected result:
 
@@ -32,7 +33,7 @@ Expected result:
 ## 3. Prepare the benchmark manifest
 
 ```powershell
-python -m src.cli.prepare_benchmark --config config\phase1.yaml --output artifacts\manifests\phase1-benchmark.json
+phase1 prepare-benchmark --config config\phase1.yaml --output artifacts\manifests\phase1-benchmark.json
 ```
 
 Expected result:
@@ -56,7 +57,7 @@ Expected result:
 ## 5. Run the zero-shot reference baseline
 
 ```powershell
-python -m src.cli.run_baseline --model grounding_dino --manifest artifacts\manifests\phase1-benchmark.json --report artifacts\reports\grounding-dino.json
+phase1 run-baseline --model grounding_dino --manifest artifacts\manifests\phase1-benchmark.json --report artifacts\reports\grounding-dino.json
 ```
 
 Expected result:
@@ -67,7 +68,7 @@ Expected result:
 ## 6. Run the compact trainable baseline
 
 ```powershell
-python -m src.cli.run_baseline --model florence2 --manifest artifacts\manifests\phase1-benchmark.json --report artifacts\reports\florence2.json
+phase1 run-baseline --model florence2 --manifest artifacts\manifests\phase1-benchmark.json --report artifacts\reports\florence2.json
 ```
 
 Expected result:
@@ -78,7 +79,7 @@ Expected result:
 ## 7. Generate the Phase 1 summary
 
 ```powershell
-python -m src.cli.summarize_phase1 --reports artifacts\reports --output artifacts\reports\phase1-summary.json
+phase1 summarize-phase1 --reports artifacts\reports --output artifacts\reports\phase1-summary.json
 ```
 
 Expected result:
@@ -90,3 +91,9 @@ Expected result:
 
 Only after the required baseline gates pass, an optional stretch-model run may be attempted.
 This step is not required for the Phase 1 MVP.
+
+If the editable install entry point is unavailable, use the equivalent module form:
+
+```powershell
+python -m src.cli.main <command> [options]
+```

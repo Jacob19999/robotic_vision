@@ -1,0 +1,90 @@
+{
+  "manifest_id": "phase1-local",
+  "ontology_version": "v1",
+  "source_ids": [
+    "coco2017"
+  ],
+  "split_versions": {
+    "train": "phase1-train-v1",
+    "val": "phase1-val-v1",
+    "test_real_heldout": "phase1-test-v1"
+  },
+  "asset_counts": {
+    "train": 2,
+    "val": 0,
+    "test_real_heldout": 0,
+    "by_class": {
+      "mug": 1,
+      "book": 1
+    }
+  },
+  "created_at": "2026-04-09T04:15:27.420453+00:00",
+  "classes": [
+    {
+      "class_id": "mug",
+      "canonical_name": "mug",
+      "aliases": [
+        "cup"
+      ],
+      "status": "active"
+    },
+    {
+      "class_id": "book",
+      "canonical_name": "book",
+      "aliases": [],
+      "status": "active"
+    }
+  ],
+  "assets": [
+    {
+      "asset_id": "coco2017-1",
+      "source_id": "coco2017",
+      "original_identifier": "1",
+      "relative_path": "images/mug-1.jpg",
+      "width": 640,
+      "height": 480,
+      "split_name": "train",
+      "content_hash": "2f6a4464a9b60829fecc61c735ebf625cee18a5a3be5aa9dbf64e1d553799642",
+      "review_status": "accepted",
+      "annotations": [
+        {
+          "annotation_id": "coco2017-1-ann-0",
+          "class_id": "mug",
+          "source_label": "cup",
+          "bbox_xyxy": [
+            10.0,
+            12.0,
+            90.0,
+            112.0
+          ],
+          "is_ignored": false
+        }
+      ]
+    },
+    {
+      "asset_id": "coco2017-2",
+      "source_id": "coco2017",
+      "original_identifier": "2",
+      "relative_path": "images/book-1.jpg",
+      "width": 640,
+      "height": 480,
+      "split_name": "train",
+      "content_hash": "bb7027b1934df542e7d986a2b37018e027efb5d9746ac087a899c9514c3dcf82",
+      "review_status": "accepted",
+      "annotations": [
+        {
+          "annotation_id": "coco2017-2-ann-0",
+          "class_id": "book",
+          "source_label": "book",
+          "bbox_xyxy": [
+            30.0,
+            40.0,
+            150.0,
+            160.0
+          ],
+          "is_ignored": false
+        }
+      ]
+    }
+  ]
+}

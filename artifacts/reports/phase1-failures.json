@@ -1,0 +1,12 @@
+{
+  "top_failures": [
+    {
+      "failure_type": "background_confusion",
+      "count": 1
+    },
+    {
+      "failure_type": "occlusion",
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "run_id": "run-grounding",
+    "model_family": "grounding_dino",
+    "run_mode": "zero_shot",
+    "manifest_id": "phase1-sample",
+    "status": "completed",
+    "hardware_profile": {
+      "gpu_name": "Example GPU",
+      "gpu_vram_mb": 1024,
+      "system_ram_mb": 8192
+    },
+    "metrics": {
+      "latency_ms_per_image": 12.0,
+      "peak_vram_mb": 900,
+      "mAP": 0.45
+    },
+    "failure_examples": [
+      {
+        "failure_type": "background_confusion",
+        "asset_id": "asset-1"
+      }
+    ],
+    "notes": "",
+    "created_at": "2026-04-08T00:00:00+00:00"
+  },
+  {
+    "run_id": "run-florence",
+    "model_family": "florence2",
+    "run_mode": "trainable",
+    "manifest_id": "phase1-sample",
+    "status": "completed",
+    "hardware_profile": {
+      "gpu_name": "Example GPU",
+      "gpu_vram_mb": 1024,
+      "system_ram_mb": 8192
+    },
+    "metrics": {
+      "latency_ms_per_image": 18.0,
+      "peak_vram_mb": 1000,
+      "mAP": 0.62
+    },
+    "failure_examples": [
+      {
+        "failure_type": "occlusion",
+        "asset_id": "asset-2"
+      }
+    ],
+    "notes": "",
+    "created_at": "2026-04-08T00:00:00+00:00"
+  }
+]
+

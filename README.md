@@ -335,3 +335,20 @@ The most realistic path on this hardware is:
 5. PaliGemma 2 3B only as an optional stretch experiment
 
 That version of the roadmap is ambitious enough to be meaningful, while still realistic on an RTX 5070 with 12 GB VRAM and 32 GB RAM.
+
+## Local Implementation Status
+
+The repository now includes a Phase 1 implementation scaffold under `src/` and `tests/`
+covering:
+
+- benchmark preparation from curated real-image sources
+- benchmark manifest validation and split-leakage checks
+- baseline run report validation and summary generation
+- fixture-backed integration tests for benchmark preparation, baseline execution, and Phase 1 summary generation
+
+The current model runners are intentionally safe by default: they return a documented
+`blocked` status unless explicit model wiring is provided. This keeps local dry runs and
+tests reproducible without forcing heavyweight model downloads during repository bootstrap.
+
+The installed CLI entry point is `phase1`, with equivalent module access through
+`python -m src.cli.main`.

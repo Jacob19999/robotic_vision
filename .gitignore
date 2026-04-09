@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+artifacts/*
+!artifacts/reports/
+artifacts/reports/*
+!artifacts/reports/phase1-dry-run.md
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

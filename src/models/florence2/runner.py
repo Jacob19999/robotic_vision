@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from src.data.manifests.models import BenchmarkManifest
-from src.models.common.predictions import RunnerResult
+from src.models.common.predictions import ExecutionConfig, RunnerResult
 
 
 class Florence2Runner:
@@ -15,6 +15,11 @@ class Florence2Runner:
             return self.predictor(manifest)
         return RunnerResult(
             status="blocked",
+            execution_config=ExecutionConfig(
+                model_variant="florence2-base",
+                resolution=640,
+                precision_mode="fp16",
+                batch_size=1,
+            ),
             notes="Florence-2 execution requires explicit model wiring or a test predictor.",
         )
-

@@ -113,13 +113,19 @@ Keep the ontology intentionally small at first. A tighter class set makes datase
 - Purpose: main compact model for local experimentation
 - Why it fits: small enough to iterate locally, supports detection-style prompting, and is practical for lightweight fine-tuning compared with larger VLMs
 
-### Track C: Optional stretch experiment
+### Track C: Detector validation baseline
+
+- **YOLO11 Small (`yolo11s`) with `yolo11n` fallback**
+- Purpose: add a detector-oriented Phase 1 comparison track without changing the shared ingestion contract
+- Why it fits: compact YOLO11 variants are realistic for a 12 GB workstation and keep detector training/export decisions explicit before later synthetic-data work
+
+### Track D: Optional stretch experiment
 
 - **PaliGemma 2 3B with LoRA / QLoRA**
 - Purpose: test whether a compact VLM improves robustness enough to justify the extra complexity
 - Constraint: this should be optional, not required for project success
 
-If real-time deployment speed becomes the priority, add a dedicated detector later and compare it against the VLM-based approach instead of expanding the VLM track.
+The detector path is now part of the Phase 1 baseline package. Future synthetic-data work should extend the same detector-view export contract instead of creating a parallel ingestion flow.
 
 ## Dataset Strategy
 
@@ -165,6 +171,8 @@ Tasks:
 - normalize labels
 - run Grounding DINO as a zero-shot baseline
 - fine-tune Florence-2 Base locally
+- export a reproducible YOLO detector view from the benchmark manifest
+- run YOLO11 with `yolo11s` as the default and `yolo11n` as the hardware-fit fallback
 - log failure cases by cause
 
 Track at minimum:

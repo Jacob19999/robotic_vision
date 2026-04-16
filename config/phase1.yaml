@@ -20,3 +20,23 @@ splits:
   test_ratio: 0.15
   seed: 42
 fail_on_unmapped: true
+baselines:
+  grounding_dino:
+    model_variant: grounding-dino-base
+    resolution: 640
+    precision_mode: fp16
+    batch_size: 1
+    seed: 42
+  florence2:
+    model_variant: florence2-base
+    resolution: 640
+    precision_mode: fp16
+    batch_size: 1
+    seed: 42
+  yolo11:
+    model_variant: yolo11s
+    fallback_variant: yolo11n
+    resolution: 640
+    precision_mode: fp16
+    batch_size: 1
+    seed: 42

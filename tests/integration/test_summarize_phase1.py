@@ -22,4 +22,4 @@ def test_summarize_phase1_selects_best_completed_report(repo_root: Path, tmp_pat
     assert summary["recommended_path"] == "florence2"
     assert saved["manifest_id"] == "phase1-sample"
     assert saved["top_failures"][0]["count"] >= 1
-
+    assert saved["blocked_items"][0]["model_family"] == "yolo11"

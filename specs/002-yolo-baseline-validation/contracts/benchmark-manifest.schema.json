@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phase1-benchmark-manifest.schema.json",
+  "title": "Phase 1 Benchmark Manifest",
+  "type": "object",
+  "required": [
+    "manifest_id",
+    "ontology_version",
+    "source_ids",
+    "split_versions",
+    "asset_counts",
+    "created_at"
+  ],
+  "properties": {
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ontology_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "split_versions": {
+      "type": "object",
+      "required": [
+        "train",
+        "val",
+        "test_real_heldout"
+      ],
+      "properties": {
+        "train": {
+          "type": "string",
+          "minLength": 1
+        },
+        "val": {
+          "type": "string",
+          "minLength": 1
+        },
+        "test_real_heldout": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "asset_counts": {
+      "type": "object",
+      "required": [
+        "train",
+        "val",
+        "test_real_heldout",
+        "by_class"
+      ],
+      "properties": {
+        "train": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "val": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "test_real_heldout": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_class": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "class_id",
+          "canonical_name",
+          "status"
+        ],
+        "properties": {
+          "class_id": {
+            "type": "string"
+          },
+          "canonical_name": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "asset_id",
+          "source_id",
+          "original_identifier",
+          "relative_path",
+          "width",
+          "height",
+          "split_name",
+          "content_hash",
+          "review_status",
+          "annotations"
+        ],
+        "properties": {
+          "asset_id": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "original_identifier": {
+            "type": "string"
+          },
+          "relative_path": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "split_name": {
+            "type": "string"
+          },
+          "content_hash": {
+            "type": "string"
+          },
+          "review_status": {
+            "type": "string"
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "annotation_id",
+                "class_id",
+                "source_label",
+                "bbox_xyxy",
+                "is_ignored"
+              ],
+              "properties": {
+                "annotation_id": {
+                  "type": "string"
+                },
+                "class_id": {
+                  "type": "string"
+                },
+                "source_label": {
+                  "type": "string"
+                },
+                "bbox_xyxy": {
+                  "type": "array",
+                  "minItems": 4,
+                  "maxItems": 4,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "is_ignored": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

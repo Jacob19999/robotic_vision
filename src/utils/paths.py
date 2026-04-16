@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -13,13 +14,44 @@ def get_project_root() -> Path:
     return PROJECT_ROOT
 
 
+def _git_feature_name() -> str | None:
+    if not (PROJECT_ROOT / ".git").exists():
+        return None
+    result = subprocess.run(
+        ["git", "-C", str(PROJECT_ROOT), "rev-parse", "--abbrev-ref", "HEAD"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    branch = result.stdout.strip()
+    if branch and (PROJECT_ROOT / "specs" / branch).exists():
+        return branch
+    return None
+
+
 def get_feature_dir(feature_name: str | None = None) -> Path:
+    """Resolve the active feature directory under specs/.
+
+    Resolution order:
+    1. explicit ``feature_name``
+    2. ``SPECIFY_FEATURE`` environment variable
+    3. current git branch when it matches a folder under ``specs/``
+    4. ``001-phase1-baseline`` when present
+    5. the lexicographically latest feature directory
+    """
     specs_dir = PROJECT_ROOT / "specs"
-    selected = feature_name or os.environ.get("SPECIFY_FEATURE")
+    selected = feature_name or os.environ.get("SPECIFY_FEATURE") or _git_feature_name()
     if selected:
         candidate = specs_dir / selected
         if candidate.exists():
             return candidate
+        raise FileNotFoundError(f"Feature directory not found: {candidate}")
+
+    default_baseline = specs_dir / "001-phase1-baseline"
+    if default_baseline.exists():
+        return default_baseline
 
     candidates = sorted([item for item in specs_dir.iterdir() if item.is_dir()]) if specs_dir.exists() else []
     if not candidates:
@@ -61,4 +93,3 @@ def write_json(path: str | Path, payload: Any) -> Path:
 
 def artifact_path(*parts: str) -> Path:
     return PROJECT_ROOT.joinpath("artifacts", *parts)
-

@@ -10,6 +10,15 @@
       "gpu_vram_mb": 1024,
       "system_ram_mb": 8192
     },
+    "execution_config": {
+      "model_variant": "grounding-dino-base",
+      "resolution": 640,
+      "precision_mode": "fp16",
+      "batch_size": 1,
+      "seed": 42,
+      "dataset_view_id": null,
+      "checkpoint_reference": null
+    },
     "metrics": {
       "latency_ms_per_image": 12.0,
       "peak_vram_mb": 900,
@@ -35,6 +44,15 @@
       "gpu_vram_mb": 1024,
       "system_ram_mb": 8192
     },
+    "execution_config": {
+      "model_variant": "florence2-base",
+      "resolution": 640,
+      "precision_mode": "fp16",
+      "batch_size": 1,
+      "seed": 42,
+      "dataset_view_id": null,
+      "checkpoint_reference": null
+    },
     "metrics": {
       "latency_ms_per_image": 18.0,
       "peak_vram_mb": 1000,
@@ -48,6 +66,33 @@
     ],
     "notes": "",
     "created_at": "2026-04-08T00:00:00+00:00"
+  },
+  {
+    "run_id": "run-yolo",
+    "model_family": "yolo11",
+    "run_mode": "trainable",
+    "manifest_id": "phase1-sample",
+    "status": "blocked",
+    "hardware_profile": {
+      "gpu_name": "Example GPU",
+      "gpu_vram_mb": 1024,
+      "system_ram_mb": 8192
+    },
+    "execution_config": {
+      "model_variant": "yolo11n",
+      "resolution": 640,
+      "precision_mode": "fp16",
+      "batch_size": 1,
+      "seed": 42,
+      "dataset_view_id": "phase1-yolo-sample-yolo11-view",
+      "checkpoint_reference": "yolo11n.pt"
+    },
+    "metrics": {
+      "latency_ms_per_image": 0.0,
+      "peak_vram_mb": 512
+    },
+    "failure_examples": [],
+    "notes": "Blocked after fallback to yolo11n because the hardware budget was exceeded.",
+    "created_at": "2026-04-08T00:00:00+00:00"
   }
 ]
-

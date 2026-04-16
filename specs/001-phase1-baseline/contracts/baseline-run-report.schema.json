@@ -56,11 +56,11 @@
         },
         "gpu_vram_mb": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 0
         },
         "system_ram_mb": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 0
         }
       },
       "additionalProperties": true

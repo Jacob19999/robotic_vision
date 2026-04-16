@@ -14,6 +14,8 @@ Expected result:
 
 - a reproducible local Python environment exists for the project
 - the runtime includes the detector and baseline dependencies needed for YOLO11 validation
+- `config/phase1.yaml` supplies the baseline defaults, including `yolo11s` as the primary
+  detector variant and `yolo11n` as the fallback
 
 ## 2. Configure the ontology and source selection
 
@@ -101,6 +103,8 @@ Expected result:
 - the report captures execution configuration, runtime, VRAM, aggregate metrics, and
   representative failures
 - blocked runs still produce a structured report with the limiting reason recorded
+- the runner records when it falls back from `yolo11s` to `yolo11n` because of the local
+  hardware budget
 
 ## 9. Generate the Phase 1 summary
 

@@ -26,13 +26,18 @@ def build_phase1_summary(reports: list[dict]) -> dict:
         "summary_id": f"phase1-summary-{int(datetime.now(timezone.utc).timestamp())}",
         "manifest_id": reports[0]["manifest_id"],
         "run_ids": [report["run_id"] for report in reports],
-        "summary_metrics": {
-            report["model_family"]: report["metrics"]
-            for report in completed
-        },
+        "summary_metrics": {report["model_family"]: report["metrics"] for report in completed},
         "top_failures": grouped_failures,
         "recommended_path": ranked[0]["model_family"],
-        "blocked_items": [report["run_id"] for report in reports if report["status"] != "completed"],
+        "blocked_items": [
+            {
+                "run_id": report["run_id"],
+                "model_family": report["model_family"],
+                "status": report["status"],
+                "notes": report.get("notes", ""),
+            }
+            for report in reports
+            if report["status"] != "completed"
+        ],
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-

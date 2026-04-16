@@ -10,6 +10,7 @@ artifacts/*
 !artifacts/reports/
 artifacts/reports/*
 !artifacts/reports/phase1-dry-run.md
+!artifacts/reports/phase1-yolo-dry-run.md
 Thumbs.db
 .DS_Store
 .idea/

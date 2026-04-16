@@ -1,0 +1,7 @@
+path: generated
+train: train/images
+val: val/images
+test: test_real_heldout/images
+names:
+  0: mug
+  1: book

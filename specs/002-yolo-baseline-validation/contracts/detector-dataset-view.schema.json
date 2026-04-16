@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phase1-detector-dataset-view.schema.json",
+  "title": "Phase 1 Detector Dataset View",
+  "type": "object",
+  "required": [
+    "view_id",
+    "manifest_id",
+    "model_family",
+    "model_variant",
+    "dataset_root",
+    "dataset_yaml_path",
+    "annotation_format",
+    "class_order",
+    "split_exports",
+    "created_at"
+  ],
+  "properties": {
+    "view_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_variant": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset_yaml_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "annotation_format": {
+      "type": "string",
+      "enum": [
+        "yolo_txt_normalized_xywh"
+      ]
+    },
+    "class_order": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "split_exports": {
+      "type": "object",
+      "required": [
+        "train",
+        "val",
+        "test_real_heldout"
+      ],
+      "properties": {
+        "train": {
+          "$ref": "#/$defs/splitExport"
+        },
+        "val": {
+          "$ref": "#/$defs/splitExport"
+        },
+        "test_real_heldout": {
+          "$ref": "#/$defs/splitExport"
+        }
+      },
+      "additionalProperties": false
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "splitExport": {
+      "type": "object",
+      "required": [
+        "images_dir",
+        "labels_dir",
+        "asset_count"
+      ],
+      "properties": {
+        "images_dir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "labels_dir": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

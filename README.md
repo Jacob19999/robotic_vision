@@ -47,6 +47,196 @@ These constraints are **not** ideal for:
 - complex Isaac Sim scenes rendered at high resolution
 - full local ingestion of very large public datasets on day one
 
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11 (managed via [uv](https://github.com/astral-sh/uv))
+- NVIDIA GPU with ≥ 8 GB VRAM (RTX 5070 12 GB is the reference platform)
+- CUDA-compatible drivers installed
+
+### 1. Create the Environment
+
+```powershell
+uv venv --python 3.11
+.venv\Scripts\Activate.ps1
+
+# Core dependencies only (CLI, schemas, validation)
+uv pip install -e ".[dev]"
+
+# Add ML dependencies when you are ready to run models
+uv pip install -e ".[dev,ml]"
+```
+
+The `[ml]` group installs PyTorch, Transformers, Ultralytics, pycocotools, and the rest of
+the model stack. Omit it during initial setup if you only want to test the pipeline with
+fixture data.
+
+### 2. Download the Datasets
+
+The pipeline consumes COCO-format JSON annotation files. You supply these yourself and point
+the config at them.
+
+**COCO 2017** — recommended starting point
+
+Download from [https://cocodataset.org/#download](https://cocodataset.org/#download):
+
+| File | Size | Use |
+|---|---|---|
+| `val2017.zip` | ~1 GB | Quick dry run |
+| `train2017.zip` | ~18 GB | Full training set |
+| `annotations_trainval2017.zip` | ~241 MB | Required annotation JSON files |
+
+Extract so that your layout looks like:
+
+```
+data/coco2017/
+├── annotations/
+│   ├── instances_train2017.json
+│   └── instances_val2017.json
+└── images/
+    ├── train2017/
+    └── val2017/
+```
+
+**Open Images V7** — optional household-object supplement
+
+Use the [FiftyOne dataset zoo](https://docs.voxel51.com/user_guide/dataset_zoo/datasets.html)
+or the [OIDv4 toolkit](https://github.com/EscVM/OIDv4_ToolKit) to pull targeted subsets.
+Only download the categories that match your household ontology — ingesting the full Open
+Images dataset locally is not recommended on this hardware.
+
+### 3. Configure the Ontology and Sources
+
+Edit `config/phase1.yaml` before running any pipeline step.
+
+The two sections that require your input:
+
+```yaml
+ontology:
+  - class_id: mug
+    canonical_name: mug
+    aliases: [cup]          # labels that map to this class in your datasets
+  - class_id: bottle
+    canonical_name: bottle
+    aliases: [water bottle]
+  # add the remaining classes from the recommended list below
+
+sources:
+  - source_id: coco2017
+    name: COCO 2017
+    source_type: public_curated
+    format: coco
+    path: data/coco2017/annotations/instances_train2017.json
+
+  - source_id: open_images_v7   # optional
+    name: Open Images V7 subset
+    source_type: public_curated
+    format: open_images
+    path: data/open_images/annotations.json
+```
+
+All other settings (split ratios, model variants, image size, precision mode) have
+hardware-appropriate defaults for the RTX 5070 and do not need to be changed for a first run.
+
+**Recommended starting ontology** (10–15 classes):
+`mug, bottle, bowl, plate, spoon, fork, phone, remote, book, backpack, chair, table, lamp, box, trash can`
+
+Start with a small, tight class set. A narrower ontology makes label cleanup and early
+fine-tuning significantly more tractable on local hardware.
+
+### 4. Validate the Setup
+
+Run the test suite before touching any real data. All checks should pass against the bundled
+fixture data without requiring model downloads.
+
+```powershell
+pytest -q
+```
+
+Expected output: `7 passed` (schema validation, split-leakage checks, report format checks).
+
+### 5. Prepare the Benchmark Manifest
+
+```powershell
+phase1 prepare-benchmark `
+  --config config\phase1.yaml `
+  --output artifacts\manifests\phase1-benchmark.json
+```
+
+This step normalises your data sources into a single authoritative manifest: one class
+ontology, one box convention, and one frozen split policy. All downstream steps consume this
+manifest rather than the raw source files.
+
+Run the schema checks after preparation:
+
+```powershell
+pytest tests\schema tests\integration -k benchmark
+```
+
+### 6. Export the YOLO Detector View
+
+```powershell
+phase1 export-yolo-view `
+  --manifest artifacts\manifests\phase1-benchmark.json `
+  --output-dir artifacts\datasets\yolo11 `
+  --metadata artifacts\datasets\yolo11\view.json
+```
+
+This derives a YOLO-format dataset (dataset YAML + normalised `xywh` label files) from the
+benchmark manifest. It must be run before the YOLO11 baseline step. The Grounding DINO and
+Florence-2 baselines consume the manifest directly and do not require this step.
+
+### 7. Run the Baselines
+
+Run each baseline in order. Each produces a structured JSON report under `artifacts/reports/`.
+
+```powershell
+# Zero-shot reference
+phase1 run-baseline `
+  --model grounding_dino `
+  --manifest artifacts\manifests\phase1-benchmark.json `
+  --report artifacts\reports\grounding-dino.json
+
+# Compact trainable baseline
+phase1 run-baseline `
+  --model florence2 `
+  --manifest artifacts\manifests\phase1-benchmark.json `
+  --report artifacts\reports\florence2.json
+
+# Detector validation baseline
+phase1 run-baseline `
+  --model yolo11 `
+  --manifest artifacts\manifests\phase1-benchmark.json `
+  --dataset-view artifacts\datasets\yolo11\view.json `
+  --report artifacts\reports\yolo11.json
+```
+
+> **Note:** The Grounding DINO and Florence-2 runners currently return `status: blocked`
+> until the model inference wiring is added. The YOLO11 runner downloads weights
+> automatically via Ultralytics and is the most complete path for an initial end-to-end run.
+> Blocked runs still produce valid, schema-compliant reports that can flow into the summary
+> step.
+
+### 8. Generate the Phase 1 Summary
+
+```powershell
+phase1 summarize-phase1 `
+  --reports artifacts\reports `
+  --output artifacts\reports\phase1-summary.json
+```
+
+The summary compares all available baseline reports, names the preferred path by mAP, and
+lists the top failure categories for Phase 2 planning.
+
+If the `phase1` entry point is unavailable, replace it with the module form:
+
+```powershell
+python -m src.cli.main <command> [options]
+```
+
+---
+
 ## Methodology Validity Summary
 
 The overall methodology is valid, but it needs to be scoped carefully for this hardware.

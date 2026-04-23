@@ -1,33 +1,48 @@
 {
-  "summary_id": "phase1-summary-1775708157",
-  "manifest_id": "phase1-sample",
+  "summary_id": "phase1-summary-1776929446",
+  "manifest_id": "phase1-local",
   "run_ids": [
-    "run-grounding",
-    "run-florence"
+    "florence2-1775708128",
+    "grounding_dino-1775708128",
+    "yolo11-1776929219"
   ],
   "summary_metrics": {
-    "grounding_dino": {
-      "latency_ms_per_image": 12.0,
-      "peak_vram_mb": 900,
-      "mAP": 0.45
-    },
-    "florence2": {
-      "latency_ms_per_image": 18.0,
-      "peak_vram_mb": 1000,
-      "mAP": 0.62
+    "yolo11": {
+      "mAP": 0.322574,
+      "precision": 0.653195,
+      "recall": 0.387628,
+      "per_class_ap": {
+        "mug": 0.46383,
+        "book": 0.181319
+      },
+      "latency_ms_per_image": 14065.960781666667,
+      "peak_vram_mb": 0
     }
   },
   "top_failures": [
     {
-      "failure_type": "background_confusion",
-      "count": 1
+      "failure_type": "occlusion",
+      "count": 209
     },
     {
-      "failure_type": "occlusion",
-      "count": 1
+      "failure_type": "background_confusion",
+      "count": 66
     }
   ],
-  "recommended_path": "florence2",
-  "blocked_items": [],
-  "created_at": "2026-04-09T04:15:57.987647+00:00"
+  "recommended_path": "yolo11",
+  "blocked_items": [
+    {
+      "run_id": "florence2-1775708128",
+      "model_family": "florence2",
+      "status": "blocked",
+      "notes": "Florence-2 execution requires explicit model wiring or a test predictor."
+    },
+    {
+      "run_id": "grounding_dino-1775708128",
+      "model_family": "grounding_dino",
+      "status": "blocked",
+      "notes": "Grounding DINO execution requires explicit model wiring or a test predictor."
+    }
+  ],
+  "created_at": "2026-04-23T07:30:46.828268+00:00"
 }

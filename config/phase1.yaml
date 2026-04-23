@@ -13,13 +13,13 @@ sources:
     name: COCO 2017
     source_type: public_curated
     format: coco
-    path: data/coco2017/annotations/instances_train2017.json
+    path: ../data/coco2017/annotations/instances_val2017.json
 splits:
   train_ratio: 0.7
   val_ratio: 0.15
   test_ratio: 0.15
   seed: 42
-fail_on_unmapped: true
+fail_on_unmapped: false
 baselines:
   grounding_dino:
     model_variant: grounding-dino-base

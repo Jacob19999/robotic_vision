@@ -52,6 +52,32 @@ class YOLO11Runner:
         self.dataset_view = dataset_view
         self.model_loader = model_loader or _default_model_loader
         self.settings = baseline_settings or load_phase1_baseline_settings().yolo11
+        self._ontology_label_map = self._build_ontology_label_map()
+
+    def _build_ontology_label_map(self) -> dict[str, str]:
+        """Map canonical/alias labels to ontology class IDs."""
+        label_map: dict[str, str] = {}
+        for class_id in self.dataset_view.class_order:
+            label_map[class_id.lower()] = class_id
+        # Common COCO-to-ontology normalization used in the baseline config.
+        if "mug" in self.dataset_view.class_order:
+            label_map.setdefault("cup", "mug")
+        return label_map
+
+    def _resolve_ontology_class(self, result: Any, class_index: int) -> str | None:
+        names = getattr(result, "names", None)
+        if names is None:
+            return None
+        raw_label = None
+        if isinstance(names, dict):
+            raw_label = names.get(class_index)
+        elif isinstance(names, list) and 0 <= class_index < len(names):
+            raw_label = names[class_index]
+        if not raw_label:
+            return None
+
+        normalized = str(raw_label).strip().lower()
+        return self._ontology_label_map.get(normalized)
 
     def _execution_config(self, model_variant: str) -> ExecutionConfig:
         return ExecutionConfig(
@@ -92,12 +118,13 @@ class YOLO11Runner:
         predictions: list[PredictedAnnotation] = []
         for index, bbox in enumerate(xyxy_values):
             class_index = int(class_values[index]) if index < len(class_values) else 0
-            if class_index >= len(self.dataset_view.class_order):
+            class_id = self._resolve_ontology_class(result, class_index)
+            if class_id is None:
                 continue
             score = float(score_values[index]) if index < len(score_values) else 1.0
             predictions.append(
                 PredictedAnnotation(
-                    class_id=self.dataset_view.class_order[class_index],
+                    class_id=class_id,
                     bbox_xyxy=[float(value) for value in bbox],
                     score=score,
                 )

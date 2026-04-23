@@ -13,6 +13,8 @@ def load_coco_source(source: SourceConfig, base_dir: Path) -> list[RawAsset]:
     source_path = source.resolved_path(base_dir)
     with source_path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
+    split_dir = "train2017" if "train2017" in source_path.name else "val2017"
+    image_root = source_path.parent.parent / "images" / split_dir
 
     categories = {item["id"]: item["name"] for item in payload.get("categories", [])}
     annotations_by_image: dict[int, list[dict[str, object]]] = defaultdict(list)
@@ -22,6 +24,10 @@ def load_coco_source(source: SourceConfig, base_dir: Path) -> list[RawAsset]:
     assets: list[RawAsset] = []
     for image in payload.get("images", []):
         file_name = image["file_name"]
+        if "/" in file_name or "\\" in file_name:
+            relative_path = str((source_path.parent.parent / file_name).resolve())
+        else:
+            relative_path = str((image_root / file_name).resolve())
         raw_annotations = [
             RawAnnotation(
                 source_label=categories[item["category_id"]],
@@ -41,7 +47,7 @@ def load_coco_source(source: SourceConfig, base_dir: Path) -> list[RawAsset]:
                 asset_id=f"{source.source_id}-{image['id']}",
                 source_id=source.source_id,
                 original_identifier=str(image["id"]),
-                relative_path=file_name,
+                relative_path=relative_path,
                 width=int(image["width"]),
                 height=int(image["height"]),
                 content_hash=content_hash,

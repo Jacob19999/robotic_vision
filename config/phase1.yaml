@@ -10,10 +10,10 @@ ontology:
     aliases: []
 sources:
   - source_id: coco2017
-    name: COCO 2017 sample
+    name: COCO 2017
     source_type: public_curated
     format: coco
-    path: ../tests/fixtures/phase1_benchmark/manifest_input.json
+    path: data/coco2017/annotations/instances_train2017.json
 splits:
   train_ratio: 0.7
   val_ratio: 0.15

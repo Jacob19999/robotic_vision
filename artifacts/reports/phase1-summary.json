@@ -1,51 +1,56 @@
 {
   "report_type": "professor_progress_update",
   "report_title": "Phase 1 Progress Update",
-  "date": "2026-04-23",
+  "date": "2026-04-24",
   "project": "Robotic Vision Baseline Evaluation",
   "today_progress": {
-    "focus": "Completed baseline evaluation summary and selected the best current path for Phase 1.",
+    "focus": "Completed full YOLO11 training on GPU and replaced the quick baseline with best-checkpoint held-out evaluation.",
     "work_completed": [
-      "Executed and summarized the latest detector runs.",
-      "Compared available baseline outputs and confirmed YOLO11 as the strongest current candidate.",
-      "Documented quantitative performance and major error patterns for follow-up improvements.",
-      "Identified blockers for Florence-2 and Grounding DINO integration."
+      "Trained YOLO11s for 100 epochs on the exported detector view from COCO train2017 using CUDA.",
+      "Selected the best checkpoint from training (`best.pt`) instead of using the final epoch checkpoint.",
+      "Ran clean held-out evaluation on `test_real_heldout` and exported the result to `artifacts/reports/yolo11-best-eval.json`.",
+      "Updated Phase 1 summary to supersede the earlier quick-baseline-only metrics."
     ]
   },
   "key_results": {
     "selected_model": "yolo11",
     "metrics": {
-      "mAP": 0.322574,
-      "precision": 0.653195,
-      "recall": 0.387628,
-      "per_class_ap": {
-        "mug": 0.46383,
-        "book": 0.181319
+      "mAP50": 0.4527316124904619,
+      "mAP50_95": 0.30303727891875903,
+      "precision": 0.4907788209880072,
+      "recall": 0.47038889325436967,
+      "per_class_ap50_95": {
+        "mug": 0.4776883042844144,
+        "book": 0.12838625355310357
       }
     },
     "observations": [
-      "Current YOLO scores are still modest because this is an early, small baseline setup with limited data/coverage.",
-      "Detection quality is currently stronger for mugs than books.",
-      "Primary failure driver is object occlusion; secondary issue is background confusion."
+      "This summary supersedes the earlier quick YOLO baseline (mAP around 0.32) and reflects full training + held-out evaluation.",
+      "The model remains substantially stronger on mugs than books, indicating class imbalance and/or harder book localization cases.",
+      "Training peaked mid-run, so checkpoint selection matters; best-checkpoint evaluation is the authoritative result."
     ]
   },
   "today_issues_and_blockers": [
-    "Florence-2 pipeline is blocked pending explicit model wiring or a test predictor.",
-    "Grounding DINO pipeline is blocked pending explicit model wiring or a test predictor."
+    "Grounding DINO pipeline remains blocked pending explicit model wiring or a test predictor.",
+    "Florence-2 pipeline remains blocked pending explicit model wiring or a test predictor.",
+    "Book-class AP remains the main quality bottleneck for detector parity across classes."
   ],
   "next_steps": [
-    "Unblock Florence-2 and Grounding DINO execution paths.",
-    "Target occlusion-robust improvements through data and augmentation adjustments.",
-    "Re-run comparative evaluation after integration fixes and report deltas."
+    "Use the saved best checkpoint for inference/evaluation workflows instead of the final epoch checkpoint.",
+    "Run targeted improvements for book-class recall and AP (class balance, hard-example mining, augmentation tuning).",
+    "Re-run comparative evaluation when Florence-2 and Grounding DINO live paths are unblocked."
   ],
   "source_traceability": {
-    "summary_id": "phase1-summary-1776929446",
+    "summary_id": "phase1-summary-1777000000",
     "manifest_id": "phase1-local",
+    "training_run_dir": "runs/detect/artifacts/training/yolo11-fulltrain-gpu",
+    "best_checkpoint": "runs/detect/artifacts/training/yolo11-fulltrain-gpu/weights/best.pt",
+    "best_checkpoint_eval_report": "artifacts/reports/yolo11-best-eval.json",
     "run_ids": [
       "florence2-1775708128",
       "grounding_dino-1775708128",
-      "yolo11-1776929219"
+      "yolo11-fulltrain-best-checkpoint"
     ]
   },
-  "generated_at": "2026-04-23T07:30:46.828268+00:00"
+  "generated_at": "2026-04-24T06:23:00+00:00"
 }

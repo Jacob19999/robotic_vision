@@ -10,6 +10,7 @@
     "manifest_id",
     "status",
     "hardware_profile",
+    "execution_config",
     "metrics",
     "created_at"
   ],
@@ -64,6 +65,52 @@
         }
       },
       "additionalProperties": true
+    },
+    "execution_config": {
+      "type": "object",
+      "required": [
+        "model_variant",
+        "resolution",
+        "precision_mode",
+        "batch_size"
+      ],
+      "properties": {
+        "model_variant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolution": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "precision_mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "batch_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "dataset_view_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "checkpoint_reference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
     },
     "metrics": {
       "type": "object",

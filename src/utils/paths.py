@@ -64,7 +64,18 @@ def get_contracts_dir(feature_name: str | None = None) -> Path:
 
 
 def get_contract_path(filename: str, feature_name: str | None = None) -> Path:
-    return get_contracts_dir(feature_name) / filename
+    preferred = get_contracts_dir(feature_name) / filename
+    if preferred.exists():
+        return preferred
+
+    specs_dir = PROJECT_ROOT / "specs"
+    if specs_dir.exists():
+        for feature_dir in sorted([item for item in specs_dir.iterdir() if item.is_dir()], reverse=True):
+            candidate = feature_dir / "contracts" / filename
+            if candidate.exists():
+                return candidate
+
+    return preferred
 
 
 def ensure_parent(path: str | Path) -> Path:

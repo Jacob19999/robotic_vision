@@ -14,7 +14,9 @@ from src.models.common.predictions import AssetPrediction, ExecutionConfig, Pred
 def _default_model_loader(model_variant: str) -> Any:
     from ultralytics import YOLO
 
-    return YOLO(f"{model_variant}.pt")
+    candidate = Path(model_variant)
+    model_source = str(candidate) if candidate.exists() else f"{model_variant}.pt"
+    return YOLO(model_source)
 
 
 def _is_hardware_limit(error: Exception) -> bool:
@@ -53,6 +55,9 @@ class YOLO11Runner:
         self.model_loader = model_loader or _default_model_loader
         self.settings = baseline_settings or load_phase1_baseline_settings().yolo11
         self._ontology_label_map = self._build_ontology_label_map()
+        self._trained_best_checkpoint = (
+            Path("runs/detect/artifacts/training/yolo11-fulltrain-gpu/weights/best.pt").resolve()
+        )
 
     def _build_ontology_label_map(self) -> dict[str, str]:
         """Map canonical/alias labels to ontology class IDs."""
@@ -79,7 +84,7 @@ class YOLO11Runner:
         normalized = str(raw_label).strip().lower()
         return self._ontology_label_map.get(normalized)
 
-    def _execution_config(self, model_variant: str) -> ExecutionConfig:
+    def _execution_config(self, model_variant: str, checkpoint_reference: str) -> ExecutionConfig:
         return ExecutionConfig(
             model_variant=model_variant,
             resolution=self.settings.resolution,
@@ -87,8 +92,13 @@ class YOLO11Runner:
             batch_size=self.settings.batch_size,
             seed=self.settings.seed,
             dataset_view_id=self.dataset_view.view_id,
-            checkpoint_reference=f"{model_variant}.pt",
+            checkpoint_reference=checkpoint_reference,
         )
+
+    def _resolve_primary_checkpoint_reference(self, model_variant: str) -> str:
+        if self._trained_best_checkpoint.exists():
+            return str(self._trained_best_checkpoint)
+        return f"{model_variant}.pt"
 
     def _resolve_image_path(self, asset: DatasetAsset) -> Path:
         split_export = self.dataset_view.split_exports[asset.split_name or "train"]
@@ -131,46 +141,54 @@ class YOLO11Runner:
             )
         return AssetPrediction(asset_id=asset.asset_id, predictions=predictions)
 
-    def _run_variant(self, manifest: BenchmarkManifest, model_variant: str) -> RunnerResult:
-        model = self.model_loader(model_variant)
+    def _run_variant(
+        self,
+        manifest: BenchmarkManifest,
+        model_variant: str,
+        checkpoint_reference: str,
+    ) -> RunnerResult:
+        loader_input = checkpoint_reference if self.model_loader is _default_model_loader else model_variant
+        model = self.model_loader(loader_input)
         predictions = [self._predict_for_asset(model, asset) for asset in manifest.assets]
         return RunnerResult(
             status="completed",
-            execution_config=self._execution_config(model_variant),
+            execution_config=self._execution_config(model_variant, checkpoint_reference),
             predictions=predictions,
-            notes=f"YOLO11 executed with {model_variant}.",
+            notes=f"YOLO11 executed with {checkpoint_reference}.",
         )
 
     def run(self, manifest: BenchmarkManifest) -> RunnerResult:
         primary_variant = self.settings.model_variant
         fallback_variant = self.settings.fallback_variant
+        primary_checkpoint = self._resolve_primary_checkpoint_reference(primary_variant)
+        fallback_checkpoint = f"{fallback_variant}.pt" if fallback_variant else ""
         fallback_reason: str | None = None
 
         try:
-            return self._run_variant(manifest, primary_variant)
+            return self._run_variant(manifest, primary_variant, primary_checkpoint)
         except ImportError as error:
             return RunnerResult(
                 status="blocked",
-                execution_config=self._execution_config(primary_variant),
+                execution_config=self._execution_config(primary_variant, primary_checkpoint),
                 notes=f"YOLO11 execution is blocked because Ultralytics is unavailable: {error}",
             )
         except FileNotFoundError as error:
             return RunnerResult(
                 status="blocked",
-                execution_config=self._execution_config(primary_variant),
+                execution_config=self._execution_config(primary_variant, primary_checkpoint),
                 notes=str(error),
             )
         except Exception as error:
             if not fallback_variant or fallback_variant == primary_variant or not _is_hardware_limit(error):
                 return RunnerResult(
                     status="failed",
-                    execution_config=self._execution_config(primary_variant),
+                    execution_config=self._execution_config(primary_variant, primary_checkpoint),
                     notes=f"YOLO11 execution failed for {primary_variant}: {error}",
                 )
             fallback_reason = str(error)
 
         try:
-            result = self._run_variant(manifest, fallback_variant)
+            result = self._run_variant(manifest, fallback_variant, fallback_checkpoint)
             result.notes = (
                 f"YOLO11 fell back from {primary_variant} to {fallback_variant} after a hardware limit: "
                 f"{fallback_reason}"
@@ -180,7 +198,7 @@ class YOLO11Runner:
             status = "blocked" if _is_hardware_limit(error) else "failed"
             return RunnerResult(
                 status=status,
-                execution_config=self._execution_config(fallback_variant),
+                execution_config=self._execution_config(fallback_variant, fallback_checkpoint),
                 notes=(
                     f"YOLO11 could not complete with {primary_variant} ({fallback_reason}) "
                     f"or {fallback_variant} ({error})."

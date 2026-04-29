@@ -81,11 +81,13 @@ the config at them.
 
 Download from [https://cocodataset.org/#download](https://cocodataset.org/#download):
 
-| File | Size | Use |
-|---|---|---|
-| `val2017.zip` | ~1 GB | Quick dry run |
-| `train2017.zip` | ~18 GB | Full training set |
+
+| File                           | Size    | Use                            |
+| ------------------------------ | ------- | ------------------------------ |
+| `val2017.zip`                  | ~1 GB   | Quick dry run                  |
+| `train2017.zip`                | ~18 GB  | Full training set              |
 | `annotations_trainval2017.zip` | ~241 MB | Required annotation JSON files |
+
 
 Extract so that your layout looks like:
 
@@ -252,18 +254,18 @@ The overall methodology is valid, but it needs to be scoped carefully for this h
 ### What should be treated as a stretch goal
 
 - **PaliGemma 2 3B + LoRA:** feasible only as a constrained experiment, not the default core track.
-  Use 4-bit loading or another memory-saving setup, low image resolution, batch size 1, and gradient accumulation.
+Use 4-bit loading or another memory-saving setup, low image resolution, batch size 1, and gradient accumulation.
 - **Isaac Sim / Omniverse synthetic generation:** feasible only in a lightweight form on this machine.
-  The latest Isaac Sim releases officially target higher-end GPUs than a 12 GB card, so the sim pipeline should start small and may need an older version, headless generation, or a fallback synthetic pipeline if performance is poor.
+The latest Isaac Sim releases officially target higher-end GPUs than a 12 GB card, so the sim pipeline should start small and may need an older version, headless generation, or a fallback synthetic pipeline if performance is poor.
 
 ### What should be changed from the original roadmap
 
 - Do **not** start by normalizing all of Open Images or Objects365 locally.
-  Start with curated subsets plus smaller indoor datasets.
+Start with curated subsets plus smaller indoor datasets.
 - Do **not** run all model tracks in parallel at full scale.
-  Sequence them: zero-shot baseline, one trainable compact model, then one optional stretch model.
+Sequence them: zero-shot baseline, one trainable compact model, then one optional stretch model.
 - Do **not** assume the newest Isaac Sim stack will be comfortable on this machine.
-  Treat synthetic generation as a scoped milestone with a fallback plan.
+Treat synthetic generation as a scoped milestone with a fallback plan.
 
 ## Recommended Project Scope
 
@@ -322,11 +324,11 @@ The detector path is now part of the Phase 1 baseline package. Future synthetic-
 ### Recommended data sources
 
 - **Curated subsets of Open Images or Objects365**
-  Use only categories and image slices that match the household ontology.
+Use only categories and image slices that match the household ontology.
 - **Indoor or household-focused datasets from Roboflow Universe, Hugging Face, or academic sources**
-  Use these for class relevance and cluttered indoor scenes.
+Use these for class relevance and cluttered indoor scenes.
 - **In-house collected images**
-  These are the most important for final validation.
+These are the most important for final validation.
 
 ### Label normalization rules
 
@@ -388,12 +390,12 @@ real-data baseline workflow.
 
 - benchmark preparation completed successfully and produced `artifacts/manifests/phase1-benchmark.json`
 - the current sample benchmark uses `manifest_id: phase1-local`, one source (`coco2017`),
-  two accepted assets, and two active classes (`mug`, `book`)
+two accepted assets, and two active classes (`mug`, `book`)
 - both baseline commands run successfully at the CLI level and emit valid structured reports
 - the current Grounding DINO and Florence-2 runs are intentionally `blocked` until explicit
-  model wiring is added
+model wiring is added
 - fixture-backed completed reports were still used to validate the Phase 1 summary path, and
-  that comparison recommended `florence2` over `grounding_dino` (`mAP 0.62` vs `0.45`)
+that comparison recommended `florence2` over `grounding_dino` (`mAP 0.62` vs `0.45`)
 - local validation passed with `7/7` pytest checks green
 
 This means Phase 1 is implemented as a reproducible benchmark-and-reporting pipeline, even
@@ -587,27 +589,27 @@ The main Phase 1 artifacts live under `specs/001-phase1-baseline/` and are organ
 project can be understood from requirements through implementation.
 
 - `specs/001-phase1-baseline/spec.md`
-  defines the Phase 1 feature scope, user stories, and success criteria
+defines the Phase 1 feature scope, user stories, and success criteria
 - `specs/001-phase1-baseline/plan.md`
-  captures the implementation plan, technical context, hardware constraints, and structure
+captures the implementation plan, technical context, hardware constraints, and structure
 - `specs/001-phase1-baseline/research.md`
-  records the key decisions behind model choice, dataset order, and local-environment strategy
+records the key decisions behind model choice, dataset order, and local-environment strategy
 - `specs/001-phase1-baseline/data-model.md`
-  describes the core entities such as benchmark manifests, assets, runs, metrics, and failures
+describes the core entities such as benchmark manifests, assets, runs, metrics, and failures
 - `specs/001-phase1-baseline/contracts/`
-  contains the CLI contract and the JSON schemas for benchmark manifests and run reports
+contains the CLI contract and the JSON schemas for benchmark manifests and run reports
 - `specs/001-phase1-baseline/tasks.md`
-  is the executable checklist used to implement and verify the Phase 1 work
+is the executable checklist used to implement and verify the Phase 1 work
 - `config/phase1.yaml`
-  is the sample local configuration for ontology and source selection
+is the sample local configuration for ontology and source selection
 - `src/cli/prepare_benchmark.py`
-  builds the normalized benchmark manifest from approved real-image inputs
+builds the normalized benchmark manifest from approved real-image inputs
 - `src/cli/run_baseline.py`
-  executes a baseline path and writes the structured run report
+executes a baseline path and writes the structured run report
 - `src/cli/summarize_phase1.py`
-  compares completed runs and generates the Phase 1 summary artifact
+compares completed runs and generates the Phase 1 summary artifact
 - `artifacts/reports/phase1-dry-run.md`
-  records the implementation dry run, what succeeded, and what is still intentionally blocked
+records the implementation dry run, what succeeded, and what is still intentionally blocked
 
 Together, these files provide the complete Phase 1 trail: what the project is supposed to do,
 how it is designed, how it was implemented, and what the current results look like.

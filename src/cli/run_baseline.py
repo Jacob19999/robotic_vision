@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import Optional
 
 import typer
 import yaml
@@ -155,7 +156,7 @@ def run_baseline_command(
     model: str = typer.Option(..., help="grounding_dino, florence2, or yolo11"),
     manifest: Path = typer.Option(..., exists=True, file_okay=True, dir_okay=False),
     report: Path = typer.Option(...),
-    dataset_view: Path | None = typer.Option(None, exists=True, file_okay=True, dir_okay=False),
+    dataset_view: Optional[Path] = typer.Option(None, exists=True, file_okay=True, dir_okay=False),
 ) -> None:
     payload = run_baseline(model, manifest, report, dataset_view)
     typer.echo(f"Wrote baseline report {payload['run_id']} to {report}")

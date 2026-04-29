@@ -1,0 +1,96 @@
+plan_id: phase2-lightweight-synthetic
+output_root: artifacts/synthetic/phase2
+seed: 42
+max_total_frames: 300
+failure_focus_limit: 3
+heldout_policy: Synthetic images are train-only supplements; val and test stay real-only.
+asset_packs:
+  - pack_id: simready_furniture_misc
+    provider: nvidia
+    name: SimReady Furniture & Misc Assets Pack
+    source_url: https://docs.omniverse.nvidia.com/usd/latest/usd_content_samples/downloadable_packs.html#simready-furniture-misc-assets-pack
+    categories: [chairs, tables, desks, cabinetry, shelving, kitchen_items, food]
+    local_path_hint: downloads/nvidia/simready_furniture_misc
+    size_gb: 9.4
+    required: true
+    notes: Primary NVIDIA premade asset pack for household tabletop and desk scenes.
+  - pack_id: sample_scenes
+    provider: nvidia
+    name: Sample Scenes Asset Pack
+    source_url: https://docs.omniverse.nvidia.com/usd/latest/usd_content_samples/downloadable_packs.html#sample-scenes-asset-pack
+    categories: [indoor_scene, attic, materials, physics_samples]
+    local_path_hint: downloads/nvidia/sample_scenes
+    size_gb: 26.0
+    required: false
+    notes: Optional premade scenes for background variation when local storage allows.
+  - pack_id: simready_containers_shipping_01
+    provider: nvidia
+    name: SimReady Containers & Shipping 01 Assets Pack
+    source_url: https://docs.omniverse.nvidia.com/usd/latest/usd_content_samples/downloadable_packs.html#simready-containers-shipping-01-assets-pack
+    categories: [cardboard_boxes, cases, containers, totes]
+    local_path_hint: downloads/nvidia/simready_containers_shipping_01
+    size_gb: 21.4
+    required: false
+    notes: Optional clutter and box distractors for shelf or desk scenes.
+scenes:
+  - scene_id: kitchen_counter_tabletop
+    description: Small kitchen counter or tabletop scene with one RGB camera and limited clutter.
+    target_classes: [mug, bottle, bowl, plate, spoon, fork, book]
+    frame_count: 150
+    resolution_width: 640
+    resolution_height: 480
+    asset_pack_ids: [simready_furniture_misc]
+    base_scene_usd: omniverse://localhost/NVIDIA/Assets/Scenes/Templates/Interior/tabletop.usd
+    object_usd_paths:
+      mug:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/mug.usd
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/cup.usd
+      bottle:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/bottle.usd
+      bowl:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/bowl.usd
+      plate:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/plate.usd
+      spoon:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/spoon.usd
+      fork:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/fork.usd
+      book:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Office/book.usd
+    distractor_usd_paths:
+      - omniverse://localhost/NVIDIA/Assets/Objects/Food/cereal_box.usd
+      - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/can.usd
+      - omniverse://localhost/NVIDIA/Assets/Objects/Misc/cardboard_box.usd
+    camera_distance_range_m: [0.75, 1.5]
+    camera_height_range_m: [0.75, 1.35]
+    clutter_count_range: [1, 4]
+    lighting_intensity_range: [250.0, 1100.0]
+  - scene_id: shelf_desk_clutter
+    description: Shelf or desk clutter scene targeting occlusion and class imbalance failures.
+    target_classes: [book, mug, remote, phone, box, lamp]
+    frame_count: 150
+    resolution_width: 640
+    resolution_height: 480
+    asset_pack_ids: [simready_furniture_misc, simready_containers_shipping_01]
+    base_scene_usd: omniverse://localhost/NVIDIA/Assets/Scenes/Templates/Interior/desk.usd
+    object_usd_paths:
+      book:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Office/book.usd
+      mug:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Kitchen/mug.usd
+      remote:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Electronics/remote_control.usd
+      phone:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Electronics/phone.usd
+      box:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Misc/cardboard_box.usd
+      lamp:
+        - omniverse://localhost/NVIDIA/Assets/Objects/Furniture/lamp.usd
+    distractor_usd_paths:
+      - omniverse://localhost/NVIDIA/Assets/Objects/Misc/bin.usd
+      - omniverse://localhost/NVIDIA/Assets/Objects/Misc/tote.usd
+      - omniverse://localhost/NVIDIA/Assets/Objects/Office/notebook.usd
+    camera_distance_range_m: [0.9, 1.8]
+    camera_height_range_m: [0.9, 1.6]
+    clutter_count_range: [2, 6]
+    lighting_intensity_range: [180.0, 900.0]

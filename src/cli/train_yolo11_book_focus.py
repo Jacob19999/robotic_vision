@@ -22,6 +22,9 @@ def train_yolo11_book_focus(
     imgsz: int = 640,
     batch: int = 8,
     patience: int = 20,
+    device: str = "0",
+    workers: int = 12,
+    cache: bool = True,
 ) -> dict:
     from ultralytics import YOLO
 
@@ -43,13 +46,16 @@ def train_yolo11_book_focus(
         lr0=0.001,
         lrf=0.1,
         cls=1.5,
-        mosaic=0.7,
-        mixup=0.2,
-        copy_paste=0.15,
+        mosaic=0.3,
+        mixup=0.0,
+        copy_paste=0.0,
         fliplr=0.5,
         degrees=5.0,
         scale=0.25,
         translate=0.1,
+        device=device,
+        workers=workers,
+        cache=cache,
         save=True,
     )
 
@@ -75,12 +81,15 @@ def train_yolo11_book_focus(
             "imgsz": imgsz,
             "batch": batch,
             "patience": patience,
+            "device": device,
+            "workers": workers,
+            "cache": cache,
             "optimizer": "AdamW",
             "cls_gain": 1.5,
             "augmentations": {
-                "mosaic": 0.7,
-                "mixup": 0.2,
-                "copy_paste": 0.15,
+                "mosaic": 0.3,
+                "mixup": 0.0,
+                "copy_paste": 0.0,
                 "fliplr": 0.5,
                 "degrees": 5.0,
                 "scale": 0.25,
@@ -138,6 +147,9 @@ def train_yolo11_book_focus_command(
     imgsz: int = typer.Option(640),
     batch: int = typer.Option(8),
     patience: int = typer.Option(20),
+    device: str = typer.Option("0"),
+    workers: int = typer.Option(12),
+    cache: bool = typer.Option(True),
     report: Path = typer.Option(Path("artifacts/reports/yolo11-book-focus-eval.json")),
     baseline_report: Path = typer.Option(Path("artifacts/reports/yolo11-best-eval.json")),
     comparison_report: Path = typer.Option(Path("artifacts/reports/yolo11-book-focus-vs-best.json")),
@@ -153,6 +165,9 @@ def train_yolo11_book_focus_command(
         imgsz=imgsz,
         batch=batch,
         patience=patience,
+        device=device,
+        workers=workers,
+        cache=cache,
     )
     write_json(report, payload)
     if baseline_report.exists():

@@ -14,8 +14,23 @@ _MODEL_REPOS = {
 
 
 class Florence2Runner:
-    def __init__(self, baseline_settings: BaselineRuntimeConfig | None = None) -> None:
+    def __init__(
+        self,
+        baseline_settings: BaselineRuntimeConfig | None = None,
+        manifest_base_dir: Path | None = None,
+    ) -> None:
         self.settings = baseline_settings or load_phase1_baseline_settings().florence2
+        self.manifest_base_dir = manifest_base_dir
+        # Precision-oriented defaults for open-vocabulary Florence outputs.
+        self._max_detections_per_class = 2
+        self._min_area_ratio = 0.002
+
+    @staticmethod
+    def _bbox_area_ratio(bbox: list[float], width: int, height: int) -> float:
+        image_area = max(float(width * height), 1.0)
+        box_width = max(float(bbox[2]) - float(bbox[0]), 0.0)
+        box_height = max(float(bbox[3]) - float(bbox[1]), 0.0)
+        return (box_width * box_height) / image_area
 
     def _execution_config(self) -> ExecutionConfig:
         return ExecutionConfig(
@@ -32,11 +47,11 @@ class Florence2Runner:
         from transformers import AutoConfig, AutoModelForCausalLM, AutoProcessor
 
         repo_id = _MODEL_REPOS.get(self.settings.model_variant, self.settings.model_variant)
-        processor = AutoProcessor.from_pretrained(repo_id, trust_remote_code=True)
         config = AutoConfig.from_pretrained(repo_id, trust_remote_code=True)
         for candidate in (config, getattr(config, "text_config", None), getattr(config, "language_config", None)):
             if candidate is not None and not hasattr(candidate, "forced_bos_token_id"):
                 setattr(candidate, "forced_bos_token_id", None)
+        processor = AutoProcessor.from_pretrained(repo_id, trust_remote_code=True, config=config)
         torch_dtype = torch.float16 if self.settings.precision_mode.lower() == "fp16" else torch.float32
         device = "cuda" if torch.cuda.is_available() else "cpu"
         model = AutoModelForCausalLM.from_pretrained(
@@ -112,20 +127,25 @@ class Florence2Runner:
             )
 
         task_prompt = "<OD>"
-        class_prompt = self._text_prompt(manifest)
         label_lookup = self._label_lookup(manifest)
         predictions: list[AssetPrediction] = []
 
         for asset in manifest.assets:
             image_path = Path(asset.relative_path)
+            if not image_path.exists() and self.manifest_base_dir is not None:
+                image_path = (self.manifest_base_dir / asset.relative_path).resolve()
             if not image_path.exists():
                 predictions.append(AssetPrediction(asset_id=asset.asset_id, predictions=[]))
                 continue
             try:
                 image = Image.open(image_path).convert("RGB")
-                model_inputs = processor(text=f"{task_prompt} {class_prompt}", images=image, return_tensors="pt")
+                # Florence-2 OD expects the task token alone; extra text breaks post-processing.
+                model_inputs = processor(text=task_prompt, images=image, return_tensors="pt")
                 device = next(model.parameters()).device
                 model_inputs = {key: value.to(device) for key, value in model_inputs.items()}
+                model_dtype = next(model.parameters()).dtype
+                if "pixel_values" in model_inputs:
+                    model_inputs["pixel_values"] = model_inputs["pixel_values"].to(model_dtype)
                 with torch.no_grad():
                     generated_ids = model.generate(
                         input_ids=model_inputs["input_ids"],
@@ -144,20 +164,34 @@ class Florence2Runner:
                 labels = od.get("labels", [])
                 scores = od.get("scores", [])
 
-                asset_predictions: list[PredictedAnnotation] = []
+                class_buckets: dict[str, list[PredictedAnnotation]] = {}
                 for index, bbox in enumerate(boxes):
                     label = str(labels[index]).strip().lower() if index < len(labels) else ""
+                    if ">" in label:
+                        label = label.split(">")[-1].strip()
                     class_id = label_lookup.get(label)
                     if class_id is None:
                         continue
+                    area_ratio = self._bbox_area_ratio([float(value) for value in bbox], image.width, image.height)
+                    if area_ratio < self._min_area_ratio:
+                        continue
                     score = float(scores[index]) if index < len(scores) else 1.0
-                    asset_predictions.append(
-                        PredictedAnnotation(
-                            class_id=class_id,
-                            bbox_xyxy=[float(value) for value in bbox],
-                            score=score,
-                        )
+                    prediction = PredictedAnnotation(
+                        class_id=class_id,
+                        bbox_xyxy=[float(value) for value in bbox],
+                        score=score,
                     )
+                    class_buckets.setdefault(class_id, []).append(prediction)
+
+                asset_predictions: list[PredictedAnnotation] = []
+                for class_id, bucket in class_buckets.items():
+                    # Keep top largest boxes per class to suppress dense false positives.
+                    ranked = sorted(
+                        bucket,
+                        key=lambda item: self._bbox_area_ratio(item.bbox_xyxy, image.width, image.height),
+                        reverse=True,
+                    )
+                    asset_predictions.extend(ranked[: self._max_detections_per_class])
                 predictions.append(AssetPrediction(asset_id=asset.asset_id, predictions=asset_predictions))
             except Exception:
                 predictions.append(AssetPrediction(asset_id=asset.asset_id, predictions=[]))

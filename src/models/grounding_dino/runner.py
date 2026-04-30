@@ -14,8 +14,13 @@ _MODEL_REPOS = {
 
 
 class GroundingDINORunner:
-    def __init__(self, baseline_settings: BaselineRuntimeConfig | None = None) -> None:
+    def __init__(
+        self,
+        baseline_settings: BaselineRuntimeConfig | None = None,
+        manifest_base_dir: Path | None = None,
+    ) -> None:
         self.settings = baseline_settings or load_phase1_baseline_settings().grounding_dino
+        self.manifest_base_dir = manifest_base_dir
 
     def _execution_config(self) -> ExecutionConfig:
         return ExecutionConfig(
@@ -95,6 +100,8 @@ class GroundingDINORunner:
 
         for asset in manifest.assets:
             image_path = Path(asset.relative_path)
+            if not image_path.exists() and self.manifest_base_dir is not None:
+                image_path = (self.manifest_base_dir / asset.relative_path).resolve()
             if not image_path.exists():
                 predictions.append(AssetPrediction(asset_id=asset.asset_id, predictions=[]))
                 continue

@@ -20,8 +20,8 @@ from src.utils.paths import artifact_path, read_json
 
 
 RUNNER_FACTORIES = {
-    "grounding_dino": lambda **_: GroundingDINORunner(),
-    "florence2": lambda **_: Florence2Runner(),
+    "grounding_dino": lambda manifest_base_dir=None, **_: GroundingDINORunner(manifest_base_dir=manifest_base_dir),
+    "florence2": lambda manifest_base_dir=None, **_: Florence2Runner(manifest_base_dir=manifest_base_dir),
     "yolo11": lambda dataset_view=None, **_: YOLO11Runner(dataset_view=dataset_view),
 }
 RUN_MODE_BY_MODEL = {
@@ -96,7 +96,9 @@ def run_baseline(
     report_path: str | Path,
     dataset_view_path: str | Path | None = None,
 ) -> dict:
-    manifest = BenchmarkManifest.model_validate(read_json(manifest_path))
+    manifest_file = Path(manifest_path).resolve()
+    manifest_base_dir = manifest_file.parent
+    manifest = BenchmarkManifest.model_validate(read_json(manifest_file))
     if model not in RUNNER_FACTORIES:
         raise ValueError(f"Unsupported model family: {model}")
     if model != "yolo11" and dataset_view_path is not None:
@@ -109,7 +111,7 @@ def run_baseline(
         dataset_view = _load_detector_view(dataset_view_path)
         _validate_yolo_dataset_view(manifest, dataset_view)
 
-    runner = RUNNER_FACTORIES[model](dataset_view=dataset_view)
+    runner = RUNNER_FACTORIES[model](dataset_view=dataset_view, manifest_base_dir=manifest_base_dir)
     started = time.perf_counter()
     result = runner.run(manifest)
     elapsed_ms = round((time.perf_counter() - started) * 1000, 4)

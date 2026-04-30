@@ -3,13 +3,13 @@
 This repository is being developed for **CIS 630: Advanced Artificial Intelligence Systems**.
 
 Phase 1 current results
-The current repository state includes a validated Phase 1 scaffold and dry run for the real-data baseline workflow.
+The current repository state includes a validated Phase 1 scaffold and live real-data baseline runs.
 
 benchmark preparation completed successfully and produced artifacts/manifests/phase1-benchmark.json
-the current sample benchmark uses manifest_id: phase1-local, one source (coco2017), two accepted assets, and two active classes (mug, book)
+the current benchmark uses manifest_id: phase1-local, one source (coco2017), and two active classes (mug, book)
 both baseline commands run successfully at the CLI level and emit valid structured reports
-the current Grounding DINO and Florence-2 runs are intentionally blocked until explicit model wiring is added
-fixture-backed completed reports were still used to validate the Phase 1 summary path, and that comparison recommended florence2 over grounding_dino (mAP 0.62 vs 0.45)
+the florence-2 training and evaluation path is wired and runs locally
+latest held-out comparison shows that the VLM path (florence-2) performed worse than yolo11 on detection metrics
 local validation passed with 7/7 pytest checks green
 
 ## Overview
@@ -392,10 +392,9 @@ real-data baseline workflow.
 - the current sample benchmark uses `manifest_id: phase1-local`, one source (`coco2017`),
 two accepted assets, and two active classes (`mug`, `book`)
 - both baseline commands run successfully at the CLI level and emit valid structured reports
-- the current Grounding DINO and Florence-2 runs are intentionally `blocked` until explicit
-model wiring is added
-- fixture-backed completed reports were still used to validate the Phase 1 summary path, and
-that comparison recommended `florence2` over `grounding_dino` (`mAP 0.62` vs `0.45`)
+- the Florence-2 path now runs live with full training plus held-out evaluation
+- latest held-out model comparison shows Florence-2 (VLM) underperforming YOLO11 on precision
+  and mAP for the current local setup
 - local validation passed with `7/7` pytest checks green
 
 This means Phase 1 is implemented as a reproducible benchmark-and-reporting pipeline, even

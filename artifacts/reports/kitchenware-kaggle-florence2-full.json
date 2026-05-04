@@ -1,0 +1,39 @@
+{
+  "report_type": "florence2_fulltrain_evaluation",
+  "generated_at": "2026-05-04T01:22:43.185442+00:00",
+  "checkpoint": "C:\\Users\\user\\Documents\\GitHub\\robotic_vision\\runs\\vlm\\kitchenware-kaggle-full\\florence2-fulltrain-20260504-012243\\best",
+  "base_model": "microsoft/Florence-2-base",
+  "manifest": "C:\\Users\\user\\Documents\\GitHub\\robotic_vision\\artifacts\\manifests\\kitchenware-kaggle-full.json",
+  "split": "test_real_heldout",
+  "training": {
+    "epochs": 1,
+    "learning_rate": 1e-05,
+    "gradient_accumulation_steps": 8,
+    "resolution": 640,
+    "precision_mode": "fp16",
+    "seed": 42,
+    "train_assets": 4169,
+    "val_assets": 696,
+    "optimizer": "AdamW",
+    "optimization_steps": 522,
+    "avg_train_loss": 0.26464954336809954,
+    "best_val_loss": 0.010432466242972383,
+    "val_loss_history": [
+      0.010432466242972383
+    ]
+  },
+  "summary_metrics": {
+    "precision": 0.409271,
+    "recall": 0.612175,
+    "mAP50": 0.368328,
+    "mAP50_95": 0.368328
+  },
+  "per_class_mAP50_95": {
+    "knife": 0.15625,
+    "spoon": 0.093117,
+    "glass": 0.483333,
+    "plate": 0.524138,
+    "fork": 0.128571,
+    "cup": 0.824561
+  }
+}

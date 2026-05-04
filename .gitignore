@@ -15,11 +15,12 @@ artifacts/reports/*
 !artifacts/reports/phase1-summary.json
 !artifacts/reports/phase1-summary-brief.md
 !artifacts/reports/yolo11-best-eval.json
+!artifacts/reports/kitchenware-*
 Thumbs.db
 .DS_Store
 .idea/
 .vscode/
-data/
+/data/
 downloads/
 *.pt
 runs/
